@@ -1,3 +1,1 @@
-Run from within the folder containing main.py
-
->> python ./Main.py
+Double click Main.py to run the program!
