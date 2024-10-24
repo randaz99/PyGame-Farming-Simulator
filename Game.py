@@ -18,6 +18,18 @@ class Game:
         pygame.display.set_caption('HW3_FarmingSim_Randazzo')
         self.clock = pygame.time.Clock()
 
+        self.start = False
+        self.titleText = Text(text="Press any key to start!", pos=(self.screen.width // 2 - 300, self.screen.height // 2 - 100))
+        self.screen.blit(self.titleText.img, self.titleText.collisionRect)
+        pygame.display.update()
+        while not self.start:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                    pygame.quit()
+                    sys.exit()
+                elif event.type == pygame.KEYDOWN:
+                    self.start = True
+
         self.player = Player(img=pygame.image.load("data/player.png"), pos=(self.screen.width // 2 - 50,self.screen.height // 2 - 50), colorKey=(0,0,0))
         self.mouse = Entity(pygame.image.load("data/WateringCan.png"), pos=(50,50), colorKey=(255,255,255))
 
