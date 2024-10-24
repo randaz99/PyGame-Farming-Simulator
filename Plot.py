@@ -17,7 +17,9 @@ class Plot(Entity):
         self.stageTimeRemaining = self.stageTime
         self.plant = None
         self.coolingDown = False
-        self.coolDownStartTime = pygame.time.get_ticks() - 500
+        self.coolDownStartTime = -3000
+        self.plantingSoundEffect = pygame.mixer.Sound("data/Sounds/Record 2024-10-24 at 18h18m13s-[AudioTrimmer.com].wav")
+        self.plantingSoundEffect.set_volume(0.5)
 
     @classmethod
     def setWaterBoost(cls, active):
@@ -55,6 +57,7 @@ class Plot(Entity):
                     adjustedPlotPos = (self.pos[0] + 75 / 2, self.pos[1] + 75 / 2)
                     self.plant = Entity(img=pygame.Surface((25, 25)), pos=adjustedPlotPos, color=(0, 160, 0))
                     # print("Planted")
+                    self.plantingSoundEffect.play()
             case 2:
                 self.resetPlot()
                 result = 1

@@ -12,15 +12,21 @@ class Game:
 
     def __init__(self):
         pygame.init()
-        pygame.mixer.init()
 
         scrRes = (1920, 1080)
         self.screen = pygame.display.set_mode(scrRes)
         pygame.display.set_caption('HW3_FarmingSim_Randazzo')
         self.clock = pygame.time.Clock()
 
+        pygame.mixer.init()
+        pygame.mixer.music.load("data/sounds/mary-had-a-little-lamb-blues-instrumental-191224.mp3")
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(loops=-1)
+
         self.start = False
-        self.titleText = Text(text="Press any key to start!", pos=(self.screen.width // 2 - 300, self.screen.height // 2 - 100))
+        self.title = Text(text="Farming Frenzy!", fontSize=100, pos=(self.screen.width // 2 - 300, self.screen.height // 2 - 150))
+        self.titleText = Text(text="Press any key to start...", fontSize=50, pos=(self.screen.width // 2 - 200, self.screen.height // 2 - 50))
+        self.screen.blit(self.title.img, self.title.collisionRect)
         self.screen.blit(self.titleText.img, self.titleText.collisionRect)
         pygame.display.update()
         while not self.start:
@@ -32,6 +38,8 @@ class Game:
                     self.start = True
 
         self.player = Player(img=pygame.image.load("data/images/player.png"), pos=(self.screen.width // 2 - 50,self.screen.height // 2 - 50), colorKey=(0,0,0))
+
+        self.wateringSoundEffect = pygame.mixer.Sound("data/sounds/watering-with-a-watering-can-39121_hYEqqE5m.mp3")
         self.mouseOrigionalImg = pygame.image.load("data/images/WateringCan.PNG")
         self.mousePressedImg = self.mouseOrigionalImg.copy()
         self.mousePressedImg.fill((50,50,255), special_flags=pygame.BLEND_RGB_MULT)
@@ -132,8 +140,13 @@ class Game:
             self.mouse.collisionRect = pygame.Rect(adjustedPos[0], adjustedPos[1], self.mouse.width, self.mouse.height)
             if pygame.mouse.get_pressed(num_buttons=3)[0] == True:
                 self.mouse.img = self.mousePressedImg
+                if not playing:
+                    self.wateringSoundEffect.play(loops=-1)
+                    playing = True
             else:
                 self.mouse.img = self.mouseOrigionalImg
+                self.wateringSoundEffect.stop()
+                playing = False
 
             # Pickup detection
             for pickup in self.pickups:
