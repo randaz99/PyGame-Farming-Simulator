@@ -7,6 +7,11 @@ class Pickup(Entity):
         # Call the superclass constructor to initialize common attributes
         super().__init__(img=img, pos=pos, color=color, colorKey=colorKey)
         self.type = type
+        match type:
+            case 'speed':
+                self.color= (255, 100, 0)
+            case 'water':
+                self.color= (60, 160, 255)
 
 
 

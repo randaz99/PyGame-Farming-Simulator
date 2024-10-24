@@ -12,6 +12,7 @@ class Game:
 
     def __init__(self):
         pygame.init()
+        pygame.mixer.init()
 
         scrRes = (1920, 1080)
         self.screen = pygame.display.set_mode(scrRes)
@@ -30,8 +31,12 @@ class Game:
                 elif event.type == pygame.KEYDOWN:
                     self.start = True
 
-        self.player = Player(img=pygame.image.load("data/player.png"), pos=(self.screen.width // 2 - 50,self.screen.height // 2 - 50), colorKey=(0,0,0))
-        self.mouse = Entity(pygame.image.load("data/WateringCan.png"), pos=(50,50), colorKey=(255,255,255))
+        self.player = Player(img=pygame.image.load("data/images/player.png"), pos=(self.screen.width // 2 - 50,self.screen.height // 2 - 50), colorKey=(0,0,0))
+        self.mouseOrigionalImg = pygame.image.load("data/images/WateringCan.PNG")
+        self.mousePressedImg = self.mouseOrigionalImg.copy()
+        self.mousePressedImg.fill((50,50,255), special_flags=pygame.BLEND_RGB_MULT)
+        self.mousePressedImg.set_colorkey((50,50,255))
+        self.mouse = Entity(img=self.mouseOrigionalImg, pos=(50,50), colorKey=(255,255,255))
 
         self.wallColor = (255,255,0)
         self.wall0 = Wall(img=pygame.Surface((1920, 20)), pos=(0,0), color=self.wallColor)
@@ -43,8 +48,6 @@ class Game:
         self.score = 0
         self.scoreText = Text(text=str(self.score), pos=(self.screen.width // 2 - 20,50))
 
-        self.speedColor = (255, 100, 0)
-        self.waterColor = (60, 160, 255)
         #self.pickup1 = Pickup(pos=(99, 678), color=speedColor)
 
         # declaring entity lists
@@ -74,9 +77,9 @@ class Game:
 
             # random spawns for boosts! (Pickups)
             if random.random() < 0.1/60:
-                newPickup = Pickup(pos=(random.randrange(50, 1801), random.randrange(50, 1001)), color=self.speedColor)
+                newPickup = Pickup(pos=(random.randrange(50, 1801), random.randrange(50, 1001)), type='speed')
                 if random.random() < 0.5:
-                    newPickup = Pickup(pos=(random.randrange(50,1801),random.randrange(50,1001)), color=self.waterColor, type='water')
+                    newPickup = Pickup(pos=(random.randrange(50,1801),random.randrange(50,1001)), type='water')
                 self.pickups.append(newPickup)
 
             # drawing all plots w/ their plants
@@ -127,6 +130,10 @@ class Game:
             adjustedPos = (cursorPos[0], cursorPos[1] - 70)
             self.mouse.pos = adjustedPos
             self.mouse.collisionRect = pygame.Rect(adjustedPos[0], adjustedPos[1], self.mouse.width, self.mouse.height)
+            if pygame.mouse.get_pressed(num_buttons=3)[0] == True:
+                self.mouse.img = self.mousePressedImg
+            else:
+                self.mouse.img = self.mouseOrigionalImg
 
             # Pickup detection
             for pickup in self.pickups:
