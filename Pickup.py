@@ -7,6 +7,8 @@ class Pickup(Entity):
         # Call the superclass constructor to initialize common attributes
         super().__init__(img=img, pos=pos, color=color, colorKey=colorKey)
         self.type = type
+        self.useNoise = pygame.mixer.Sound("data/sounds/coin-collect-retro-8-bit-sound-effect-145251.mp3")
+        self.useNoise.set_volume(0.5)
         match type:
             case 'speed':
                 self.color= (255, 100, 0)
@@ -15,3 +17,5 @@ class Pickup(Entity):
 
 
 
+    def playSound(self):
+        self.useNoise.play()

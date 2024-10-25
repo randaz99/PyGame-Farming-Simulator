@@ -19,7 +19,9 @@ class Plot(Entity):
         self.coolingDown = False
         self.coolDownStartTime = -3000
         self.plantingSoundEffect = pygame.mixer.Sound("data/Sounds/Record 2024-10-24 at 18h18m13s-[AudioTrimmer.com].wav")
+        self.harvestingSoundEffect = pygame.mixer.Sound("data/Sounds/hand-digging-dirt-leaves-crunch-32630-[AudioTrimmer.com].mp3")
         self.plantingSoundEffect.set_volume(0.5)
+        self.harvestingSoundEffect.set_volume(0.5)
 
     @classmethod
     def setWaterBoost(cls, active):
@@ -61,6 +63,7 @@ class Plot(Entity):
             case 2:
                 self.resetPlot()
                 result = 1
+                self.harvestingSoundEffect.play()
         return result
 
 

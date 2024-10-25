@@ -13,16 +13,21 @@ class Game:
     def __init__(self):
         pygame.init()
 
+        # screen initialization
         scrRes = (1920, 1080)
         self.screen = pygame.display.set_mode(scrRes)
         pygame.display.set_caption('HW3_FarmingSim_Randazzo')
         self.clock = pygame.time.Clock()
 
+        # background sound stuff
         pygame.mixer.init()
         pygame.mixer.music.load("data/sounds/mary-had-a-little-lamb-blues-instrumental-191224.mp3")
         pygame.mixer.music.set_volume(0.5)
         pygame.mixer.music.play(loops=-1)
+        self.backgroundNoise = pygame.mixer.Sound("data/sounds/ambience_farm_02wav-14806.mp3")
+        self.backgroundNoise.set_volume(0.1)
 
+        # title screen
         self.start = False
         self.title = Text(text="Farming Frenzy!", fontSize=100, pos=(self.screen.width // 2 - 300, self.screen.height // 2 - 150))
         self.titleText = Text(text="Press any key to start...", fontSize=50, pos=(self.screen.width // 2 - 200, self.screen.height // 2 - 50))
@@ -36,7 +41,9 @@ class Game:
                     sys.exit()
                 elif event.type == pygame.KEYDOWN:
                     self.start = True
+                    self.backgroundNoise.play(loops=-1)
 
+        # game object initializations
         self.player = Player(img=pygame.image.load("data/images/player.png"), pos=(self.screen.width // 2 - 50,self.screen.height // 2 - 50), colorKey=(0,0,0))
 
         self.wateringSoundEffect = pygame.mixer.Sound("data/sounds/watering-with-a-watering-can-39121_hYEqqE5m.mp3")
@@ -151,6 +158,7 @@ class Game:
             # Pickup detection
             for pickup in self.pickups:
                 if self.player.collisionRect.colliderect(pickup.collisionRect):
+                    pickup.playSound()
                     self.pickups.remove(pickup)
                     match pickup.type:
                         case 'speed':
