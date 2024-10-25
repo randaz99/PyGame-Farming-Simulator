@@ -13,6 +13,9 @@ class Player(Entity):
         self.normalSpeed = 3
         self.boostedSpeed = 8
         self.speedBoostStartTime = pygame.time.get_ticks() - 3000
+        self.walkNoise = pygame.mixer.Sound("data/sounds/walking-soundscape-200112.mp3")
+        self.walkNoise.set_volume(0.5)
+        self.playing = False
 
 
     def getInput(self, event):
@@ -34,7 +37,13 @@ class Player(Entity):
                 self.moveRight = False
             if event.key == pygame.K_LEFT or event.key == pygame.K_a:
                 self.moveLeft = False
-
+        if self.moveUp == True or self.moveDown == True or self.moveLeft == True or self.moveRight == True:
+            if not self.playing:
+                self.walkNoise.play(loops=-1)
+                self.playing = True
+        else:
+            self.walkNoise.stop()
+            self.playing = False
 
     def move(self, wallRects=[]):
         x = self.pos[0]

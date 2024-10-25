@@ -22,6 +22,9 @@ class Plot(Entity):
         self.harvestingSoundEffect = pygame.mixer.Sound("data/Sounds/hand-digging-dirt-leaves-crunch-32630-[AudioTrimmer.com].mp3")
         self.plantingSoundEffect.set_volume(0.5)
         self.harvestingSoundEffect.set_volume(0.5)
+        self.isBlight = False
+        self.healthyColor = (0, 160, 0)
+        self.blightColor = (160, 160, 80)
 
     @classmethod
     def setWaterBoost(cls, active):
@@ -57,7 +60,10 @@ class Plot(Entity):
                 if pygame.time.get_ticks() - self.coolDownStartTime > 3000:
                     self.plantStage = 0
                     adjustedPlotPos = (self.pos[0] + 75 / 2, self.pos[1] + 75 / 2)
-                    self.plant = Entity(img=pygame.Surface((25, 25)), pos=adjustedPlotPos, color=(0, 160, 0))
+                    color = self.healthyColor
+                    if self.isBlight:
+                        color = self.blightColor
+                    self.plant = Entity(img=pygame.Surface((25, 25)), pos=adjustedPlotPos, color=color)
                     # print("Planted")
                     self.plantingSoundEffect.play()
             case 2:
@@ -72,15 +78,34 @@ class Plot(Entity):
         self.plantStage = -1
         self.stageTimeRemaining = self.stageTime
         self.plant = None
+        self.isBlight = False
         # print(self.coolDownStartTime)
 
     def slowGrow(self):
-        self.water(speed=random.uniform(self.slowGrowSpeed-self.slowGrowSpeed, self.slowGrowSpeed+self.slowGrowSpeed), isSelf=True)
+        if not self.isBlight:
+            self.water(speed=random.uniform(self.slowGrowSpeed-self.slowGrowSpeed, self.slowGrowSpeed+self.slowGrowSpeed), isSelf=True)
+        else:
+            self.water(speed=random.uniform(-5*(self.slowGrowSpeed-self.slowGrowSpeed), -5*(self.slowGrowSpeed+self.slowGrowSpeed)), isSelf=True)
+            if self.stageTimeRemaining > self.stageTime:
+                self.plantStage -= 1
+                self.stageTimeRemaining = self.stageTime
+                if self.plantStage < 0:
+                    self.resetPlot()
+
 
     def checkPlantStage(self):
+        color = self.healthyColor
+        if self.isBlight:
+            color = self.blightColor
         match self.plantStage:
             case 1:
                 adjustedPlotPos = (self.pos[0] + 50 / 2, self.pos[1] + 50 / 2)
-                self.plant = Entity(img=pygame.Surface((50, 50)), pos=adjustedPlotPos, color=(0, 160, 0))
+                self.plant = Entity(img=pygame.Surface((50, 50)), pos=adjustedPlotPos, color=color)
             case 2:
-                self.plant = Entity(img=pygame.Surface((100, 100)), pos=self.pos, color=(0, 160, 0))
+                self.plant = Entity(img=pygame.Surface((100, 100)), pos=self.pos, color=color)
+
+    def blightCrop(self):
+        if self.plantStage > -1:
+            self.plant.color = self.blightColor
+            self.isBlight = True
+            print("BLIGHT!")

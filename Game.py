@@ -44,6 +44,7 @@ class Game:
                     self.backgroundNoise.play(loops=-1)
 
         # game object initializations
+        self.stage = 0
         self.player = Player(img=pygame.image.load("data/images/player.png"), pos=(self.screen.width // 2 - 50,self.screen.height // 2 - 50), colorKey=(0,0,0))
 
         self.wateringSoundEffect = pygame.mixer.Sound("data/sounds/watering-with-a-watering-can-39121_hYEqqE5m.mp3")
@@ -88,47 +89,8 @@ class Game:
     def run(self):
         pygame.mouse.set_visible(False)
         while True:
-            self.screen.fill((0, 0, 0))
-
-            # random spawns for boosts! (Pickups)
-            if random.random() < 0.1/60:
-                newPickup = Pickup(pos=(random.randrange(50, 1801), random.randrange(50, 1001)), type='speed')
-                if random.random() < 0.5:
-                    newPickup = Pickup(pos=(random.randrange(50,1801),random.randrange(50,1001)), type='water')
-                self.pickups.append(newPickup)
-
-            # drawing all plots w/ their plants
-            for plot in self.plots:
-                if plot.color is not None:
-                    pygame.draw.rect(self.screen, plot.color, plot.collisionRect)
-                else:
-                    self.screen.blit(plot.img, plot.pos)
-                if plot.plant is not None and plot.plant.color is not None:
-                    pygame.draw.rect(self.screen, plot.plant.color, plot.plant.collisionRect)
-                elif plot.plant is not None:
-                    self.screen.blit(plot.plant.img, plot.plant.pos)
-            # drawing all walls
-            for wall in self.walls:
-                if wall.color is not None:
-                    pygame.draw.rect(self.screen, wall.color, wall.collisionRect)
-                else:
-                    self.screen.blit(wall.img, wall.pos)
-            # drawing all pickups
-            for pickup in self.pickups:
-                if pickup.color is not None:
-                    pygame.draw.rect(self.screen, pickup.color, pickup.collisionRect)
-                else:
-                    self.screen.blit(pickup.img, pickup.pos)
-            # drawing all player things
-            for playerThing in self.playerThings:
-                if playerThing.color is not None:
-                    pygame.draw.rect(self.screen, playerThing.color, playerThing.collisionRect)
-                else:
-                    self.screen.blit(playerThing.img, playerThing.pos)
-            # Drawing UI things
-            for text in self.texts:
-                self.screen.blit(text.img, text.collisionRect)
-
+            # draw everything
+            self.draw()
 
             # event handling
             for event in pygame.event.get():
@@ -155,6 +117,15 @@ class Game:
                 self.wateringSoundEffect.stop()
                 playing = False
 
+            # random spawns for boosts! (Pickups)
+            if random.random() < 0.1 / 60:
+                newPickup = Pickup(pos=(random.randrange(50, 1801), random.randrange(50, 1001)), type='speed')
+                if random.random() < 0.5:
+                    newPickup = Pickup(pos=(random.randrange(50, 1801), random.randrange(50, 1001)), type='water')
+                self.pickups.append(newPickup)
+
+
+
             # Pickup detection
             for pickup in self.pickups:
                 if self.player.collisionRect.colliderect(pickup.collisionRect):
@@ -172,6 +143,9 @@ class Game:
                     self.score += plot.interact()
                 if plot.collisionRect.colliderect(self.mouse.collisionRect) and pygame.mouse.get_pressed(num_buttons=3)[0] == True:
                     plot.water()
+                # random spawns for boosts! (Pickups)
+                if random.random() < 0.1 / 60:
+                    plot.blightCrop()
                 plot.slowGrow()
 
             # print(self.score)
@@ -180,3 +154,38 @@ class Game:
             self.player.update()
             Plot.update()
             self.clock.tick(60)
+
+
+    def draw(self):
+        self.screen.fill((0, 0, 0))
+        # drawing all plots w/ their plants
+        for plot in self.plots:
+            if plot.color is not None:
+                pygame.draw.rect(self.screen, plot.color, plot.collisionRect)
+            else:
+                self.screen.blit(plot.img, plot.pos)
+            if plot.plant is not None and plot.plant.color is not None:
+                pygame.draw.rect(self.screen, plot.plant.color, plot.plant.collisionRect)
+            elif plot.plant is not None:
+                self.screen.blit(plot.plant.img, plot.plant.pos)
+        # drawing all walls
+        for wall in self.walls:
+            if wall.color is not None:
+                pygame.draw.rect(self.screen, wall.color, wall.collisionRect)
+            else:
+                self.screen.blit(wall.img, wall.pos)
+        # drawing all pickups
+        for pickup in self.pickups:
+            if pickup.color is not None:
+                pygame.draw.rect(self.screen, pickup.color, pickup.collisionRect)
+            else:
+                self.screen.blit(pickup.img, pickup.pos)
+        # drawing all player things
+        for playerThing in self.playerThings:
+            if playerThing.color is not None:
+                pygame.draw.rect(self.screen, playerThing.color, playerThing.collisionRect)
+            else:
+                self.screen.blit(playerThing.img, playerThing.pos)
+        # Drawing UI things
+        for text in self.texts:
+            self.screen.blit(text.img, text.collisionRect)
