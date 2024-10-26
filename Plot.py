@@ -49,7 +49,13 @@ class Plot(Entity):
                 self.stageTimeRemaining -= speed * self.boost
             if self.stageTimeRemaining < 0:
                 self.plantStage += 1
-                self.stageTimeRemaining = self.stageTime
+                self.stageTimeRemaining = self.stageTime - 1
+        elif self.plantStage == 2:
+            # print(self.stageTimeRemaining)
+            if isSelf:
+                self.stageTimeRemaining -= speed
+            else:
+                self.stageTimeRemaining -= speed * self.boost
         self.checkPlantStage()
 
 
