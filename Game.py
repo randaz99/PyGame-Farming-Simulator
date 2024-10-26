@@ -4,9 +4,9 @@ import sys
 from Player import Player
 from Wall import Wall
 from Pickup import Pickup
-from Entity import Entity
 from Plot import Plot
 from Text import Text
+from Mouse import Mouse
 
 class Game:
 
@@ -47,12 +47,7 @@ class Game:
         self.stage = 0
         self.player = Player(img=pygame.image.load("data/images/player.png"), pos=(self.screen.width // 2 - 50,self.screen.height // 2 - 50), colorKey=(0,0,0))
 
-        self.wateringSoundEffect = pygame.mixer.Sound("data/sounds/watering-with-a-watering-can-39121_hYEqqE5m.mp3")
-        self.mouseOrigionalImg = pygame.image.load("data/images/WateringCan.PNG")
-        self.mousePressedImg = self.mouseOrigionalImg.copy()
-        self.mousePressedImg.fill((50,50,255), special_flags=pygame.BLEND_RGB_MULT)
-        self.mousePressedImg.set_colorkey((50,50,255))
-        self.mouse = Entity(img=self.mouseOrigionalImg, pos=(50,50), colorKey=(255,255,255))
+        self.mouse = Mouse(img=pygame.image.load("data/images/WateringCan.PNG"), pos=(50,50), colorKey=(255,255,255))
 
         self.wallColor = (255,255,0)
         self.wall0 = Wall(img=pygame.Surface((1920, 20)), pos=(0,0), color=self.wallColor)
@@ -98,24 +93,27 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 self.player.getInput(event)
+                self.mouse.getInput(event)
 
             # player movement
             self.player.move(self.wallRects)
 
             # mouse movement
-            cursorPos = pygame.mouse.get_pos()
-            adjustedPos = (cursorPos[0], cursorPos[1] - 70)
-            self.mouse.pos = adjustedPos
-            self.mouse.collisionRect = pygame.Rect(adjustedPos[0], adjustedPos[1], self.mouse.width, self.mouse.height)
+            self.mouse.move()
             if pygame.mouse.get_pressed(num_buttons=3)[0] == True:
-                self.mouse.img = self.mousePressedImg
-                if not playing:
-                    self.wateringSoundEffect.play(loops=-1)
-                    playing = True
+                match self.mouse.mode:
+                    case 0:
+                        self.mouse.pressedWatering()
+                    case 1:
+                        # print("in cleanse mode")
+                        self.mouse.pressedCleanse()
             else:
-                self.mouse.img = self.mouseOrigionalImg
-                self.wateringSoundEffect.stop()
-                playing = False
+                match self.mouse.mode:
+                    case 0:
+                        self.mouse.unpressedWatering()
+                    case 1:
+                        # print("in cleanse mode")
+                        self.mouse.unpressedCleanse()
 
             # random spawns for boosts! (Pickups)
             if random.random() < 0.1 / 60:
@@ -141,10 +139,15 @@ class Game:
             for plot in self.plots:
                 if self.player.collisionRect.colliderect(plot.collisionRect):
                     self.score += plot.interact()
-                if plot.collisionRect.colliderect(self.mouse.collisionRect) and pygame.mouse.get_pressed(num_buttons=3)[0] == True:
-                    plot.water()
-                # random spawns for boosts! (Pickups)
-                if random.random() < 0.1 / 60:
+                match self.mouse.mode:
+                    case 0:
+                        if plot.collisionRect.colliderect(self.mouse.collisionRect) and pygame.mouse.get_pressed(num_buttons=3)[0] == True:
+                            plot.water()
+                    case 1:
+                        if plot.collisionRect.colliderect(self.mouse.collisionRect) and pygame.mouse.get_pressed(num_buttons=3)[0] == True:
+                            plot.cleanse()
+                # random spawns for blight :(
+                if random.random() < 0.01 / 60:
                     plot.blightCrop()
                 plot.slowGrow()
 
@@ -177,6 +180,7 @@ class Game:
         # drawing all pickups
         for pickup in self.pickups:
             if pickup.color is not None:
+                pygame.draw.rect(self.screen, pickup.highlightColor, pickup.highlightRect)
                 pygame.draw.rect(self.screen, pickup.color, pickup.collisionRect)
             else:
                 self.screen.blit(pickup.img, pickup.pos)

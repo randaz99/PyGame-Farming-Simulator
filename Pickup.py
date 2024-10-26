@@ -9,6 +9,9 @@ class Pickup(Entity):
         self.type = type
         self.useNoise = pygame.mixer.Sound("data/sounds/coin-collect-retro-8-bit-sound-effect-145251.mp3")
         self.useNoise.set_volume(0.5)
+        self.highlightRect = pygame.Rect(pos[0]-1, pos[1]-1, self.width+2, self.height+2)
+        self.highlightColor = (255,255,255)
+
         match type:
             case 'speed':
                 self.color= (255, 100, 0)

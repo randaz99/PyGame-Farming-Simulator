@@ -91,16 +91,16 @@ class Plot(Entity):
         if not self.isBlight:
             self.water(speed=random.uniform(self.slowGrowSpeed-self.slowGrowSpeed, self.slowGrowSpeed+self.slowGrowSpeed), isSelf=True)
         else:
-            self.water(speed=random.uniform(-5*(self.slowGrowSpeed-self.slowGrowSpeed), -5*(self.slowGrowSpeed+self.slowGrowSpeed)), isSelf=True)
-            print(f"Stage: {self.plantStage}")
-            print(self.stageTimeRemaining)
+            self.water(speed=random.uniform(-3*(self.slowGrowSpeed-self.slowGrowSpeed), -3*(self.slowGrowSpeed+self.slowGrowSpeed)), isSelf=True)
+            #print(f"Stage: {self.plantStage}")
+            #print(self.stageTimeRemaining)
             if self.stageTimeRemaining > self.stageTime:
                 self.plantStage -= 1
                 self.stageTimeRemaining = 0
-                print("shrinking")
+                #print("shrinking")
                 if self.plantStage < 0:
                     self.resetPlot()
-                    print("dying")
+                    #print("dying")
 
 
     def checkPlantStage(self):
@@ -121,4 +121,7 @@ class Plot(Entity):
         if self.plantStage > -1:
             self.plant.color = self.blightColor
             self.isBlight = True
-            print("BLIGHT!")
+            # print("BLIGHT!")
+
+    def cleanse(self):
+        self.isBlight = False
