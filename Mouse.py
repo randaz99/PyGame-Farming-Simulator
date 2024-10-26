@@ -23,6 +23,9 @@ class Mouse(Entity):
         self.pressedCleanseImg = self.originalCleanseImg.copy()
         self.pressedCleanseImg.fill((100, 222, 100), special_flags=pygame.BLEND_RGB_MULT)
         self.pressedCleanseImg.set_colorkey((100, 222, 100))
+        self.sprayingSoundEffect = pygame.mixer.Sound("data/sounds/spray-48068-[AudioTrimmer.com].mp3")
+        self.sprayingSoundEffect.set_volume(0.3)
+
 
     def pressedWatering(self):
         self.img = self.pressedWateringImg
@@ -43,9 +46,14 @@ class Mouse(Entity):
 
     def pressedCleanse(self):
         self.img = self.pressedCleanseImg
+        if not self.playing:
+            self.sprayingSoundEffect.play(loops=-1)
+            self.playing = True
 
     def unpressedCleanse(self):
         self.img = self.originalCleanseImg
+        self.sprayingSoundEffect.stop()
+        self.playing = False
 
     def getInput(self, event):
         #print("getting input")
