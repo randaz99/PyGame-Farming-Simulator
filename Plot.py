@@ -86,11 +86,15 @@ class Plot(Entity):
             self.water(speed=random.uniform(self.slowGrowSpeed-self.slowGrowSpeed, self.slowGrowSpeed+self.slowGrowSpeed), isSelf=True)
         else:
             self.water(speed=random.uniform(-5*(self.slowGrowSpeed-self.slowGrowSpeed), -5*(self.slowGrowSpeed+self.slowGrowSpeed)), isSelf=True)
+            print(f"Stage: {self.plantStage}")
+            print(self.stageTimeRemaining)
             if self.stageTimeRemaining > self.stageTime:
                 self.plantStage -= 1
-                self.stageTimeRemaining = self.stageTime
+                self.stageTimeRemaining = 0
+                print("shrinking")
                 if self.plantStage < 0:
                     self.resetPlot()
+                    print("dying")
 
 
     def checkPlantStage(self):
@@ -98,6 +102,9 @@ class Plot(Entity):
         if self.isBlight:
             color = self.blightColor
         match self.plantStage:
+            case 0:
+                adjustedPlotPos = (self.pos[0] + 75 / 2, self.pos[1] + 75 / 2)
+                self.plant = Entity(img=pygame.Surface((25, 25)), pos=adjustedPlotPos, color=color)
             case 1:
                 adjustedPlotPos = (self.pos[0] + 50 / 2, self.pos[1] + 50 / 2)
                 self.plant = Entity(img=pygame.Surface((50, 50)), pos=adjustedPlotPos, color=color)
